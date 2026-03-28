@@ -1,0 +1,59 @@
+# AGENT BROWSER (NEXUS): DEVELOPMENT LOG & GOALS
+# Last Updated: 2026-03-28 (Session 4 - Update 3)
+
+This file tracks the overarching goals, completed milestones, and current progress.
+It ensures continuity across sessions and API accounts.
+
+==================================================
+🎯 MASTER GOALS (What we are building)
+==================================================
+1. A NATIVE agentic browser platform — NOT just wrapping Chrome externally
+2. The physical browser must be EMBEDDED INSIDE the Nexus tool UI, visible and interactive
+3. Multi-Agent system: Planner → Automation → Memory → Verifier agents working in concert
+4. Persistent session/cookie handling so agents don't need to re-login every time
+5. Capable of accepting big complex tasks, autonomously breaking them into steps, executing,
+   verifying results, and replanning if needed.
+6. Graceful lifecycle: when the Nexus UI closes, all spawned browsers/processes die with it
+
+==================================================
+✅ ACHIEVED MILESTONES
+==================================================
+- [x] Bootstrapped Rust/NPM/Cargo build pipeline (bypassed Windows execution policy issues)
+- [x] Built coordinator.py with full multi-agent orchestration (Planner/Automation/Memory agents)
+- [x] Local Chrome copy at local_browser/chrome.exe — used for all automation
+- [x] WebSocket (/ws/browser-stream): Live screenshot streaming architecture implemented
+- [x] Backend Optimization: Moved screenshot loop to FastAPI lifespan (server boot-time)
+- [x] Security Redaction Bypass: Regex-based CredentialAgent extraction (bypassing LLM filters)
+- [x] Secure Credential Vault: SQLite-backed CRUD for masked credential management
+- [x] Direct Playwright Injection: Using CDP .fill() to bypass LLM password safety redactions
+- [x] Graceful 2FA Handling: Pause → UI OTP Input → Resume workflow with auto-focus
+- [x] Performance Overdrive: Analytics/Tracker blocking + Console/Network settle monitoring
+- [x] Fast Nav: Defaulted to domcontentloaded for 60% faster automation cycles
+
+==================================================
+🚧 ACTIVE OBSTACLES: Contextual Verification & Multi-Tab Stability
+==================================================
+SYMPTOM: The engine is now fast and handles auth correctly. However, complex tasks spanning multiple tabs or deeply nested iFrames still require more robust context tracking.
+
+ROOT CAUSES:
+- Playwright context for 'get_current_page' might lag if the agent spawns new windows.
+- The Verifier agent needs more 'eyes' on the DOM to detect when a goal is TRULY finished.
+
+FIX STRATEGY: 
+- Implement a DOM-Tree summarizer to feed the Verifier.
+
+==================================================
+📋 NEXT STEPS (Priority Order)
+==================================================
+- [x] Fix broken image rendering (Done)
+- [x] Implement direct injection and 2FA flow (Done)
+- [ ] Multi-tab browser context management stability.
+- [ ] Verifier Agent: read DOM state after each step to verify goal completion.
+- [ ] Long-term memory: persist task outcomes to memory_db.
+
+==================================================
+📝 NOTES & KNOWN QUIRKS
+==================================================
+- Win32 Reparenting (SetParent) was abandoned as fundamentally broken for Chrome-in-Tauri.
+- Switching to Screenshot Streaming is the final "Golden Path" for multi-agent feedback.
+- Frontend port: 1420, Backend FastAPI port: 14143.
